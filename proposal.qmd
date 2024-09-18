@@ -28,17 +28,73 @@ library(tidyverse)
 
 ```{r}
 #| label: load-dataset
+haunted_places <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-10-10/haunted_places.csv')
 #| message: false
 ```
 
-A brief description of your dataset including its provenance, dimensions, etc. as well as the reason why you chose this dataset.
+**Data Discription**
 
-Make sure to load the data and use inline code for some of this information.
+The Haunted Places dataset contains information about haunted locations across the U.S., 
+including site names, cities, states, descriptions, and geographic coordinates (latitude and longitude). 
+It’s perfect for exploring spatial patterns, visualizing haunted places on maps, and analyzing the distribution of spooky sites.
+
+**Why This Data Set**
+Diverse Data Types: The dataset includes both text (descriptions, locations) and numeric data (coordinates), 
+allowing you to practice data cleaning, handling, and analysis across different data types.
+
+Creative Visualizations: With its unique theme, the dataset offers opportunities to create visually striking and
+thematic data visualizations, such as interactive maps or storytelling through data, making it ideal for engaging projects.
+
+'''{r}
+#dimensions of dataset
+
+dim(haunted_places)
+'''
+
+'''{r}
+#Summary of dataset
+
+summary(haunted_places)
+'''
+The dataset includes a variety of variables such as
+
+Location: Name or title of the haunted site.
+Description: Details of the haunting events.
+State: U.S. state where the site is located.
+Latitude and Longitude: Geographic coordinates for mapping.
+City: Urban or rural location context.
+
+
+'''{r}
+#Data preview
+
+head(haunted_place)
+'''
+
 
 ## Questions
 
-The two questions you want to answer.
+Question 1
 
-## Analysis plan
+How are haunted places distributed across different U.S. states? 
+Are there specific states or regions with a higher concentration of haunted locations?
 
--   A plan for answering each of the questions including the variables involved, variables to be created (if any), external data to be merged in (if any).
+Why this question
+
+We’re looking at how haunted places are spread out across different states to see if some states have more haunted sites than others. 
+This can help us understand if certain regions are more likely to have these sites and why that might be.
+
+Variable to be created
+
+State Density: This variable does not currently exist in the dataset but could be created if 
+              additional data on state population or area is obtained.
+
+Question 2
+What common themes or types of hauntings are reported in the descriptions? 
+Are there patterns or trends in the types of hauntings based on the location or state?
+
+Why this question
+
+We want to see if there are common themes or types of hauntings described in the dataset. 
+This can show us if there are recurring patterns or types of supernatural events in different places.
+
