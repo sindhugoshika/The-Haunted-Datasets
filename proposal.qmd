@@ -98,3 +98,15 @@ Why this question
 We want to see if there are common themes or types of hauntings described in the dataset. 
 This can show us if there are recurring patterns or types of supernatural events in different places.
 
+## Analysis Plan
+
+| Task Name                       | Status      | Assignee        | Due   | Priority  | Summary                                                                 |
+|----------------------------------|-------------|-----------------|-------|-----------|-------------------------------------------------------------------------|
+| Choose Dataset and Define Questions | Completed   | Team            | Week 1 | High      | Complete dataset overview and finalize questions.                       |
+| Proposal Draft                   | Completed   | Disha, Sindhu   | Week 2 | High      | Draft proposal with dataset description, questions, and plan.           |
+| Revise Proposal                  | Not Started | Team            | Week 3 | High      | Revise proposal based on feedback received.                             |
+| Data Analysis for Question 1      | Not Started | Sahana          | Week 4 | Moderate  | Perform analysis and visualizations for Question 1.                     |
+| Data Analysis for Question 2      | Not Started | Sindhu          | Week 4 | High      | Perform analysis and visualizations for Question 2.                     |
+| Write-Up Draft                   | Not Started | Team            | Week 5 | Moderate  | Draft the final write-up of findings.                                   |
+| Presentation Preparation         | Not Started | Team            | Week 6 | High      | Finalize report, prepare presentation materials, and present findings.  |
+
