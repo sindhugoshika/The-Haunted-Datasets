@@ -2,7 +2,7 @@
 title: "Haunted Places in the United States"
 subtitle: "Proposal"
 author: 
-  - name: ""
+  - name: "The Data Drafters"
     affiliations:
       - name: "College of Information Science, University of Arizona"
 description: "Project description"
