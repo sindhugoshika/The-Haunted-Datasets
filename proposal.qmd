@@ -18,13 +18,7 @@ execute:
   warning: false
 ---
 
-```{r}
-#| label: load-pkgs
-#| message: false
-library(tidyverse)
-```
-
-## Dataset
+## Dataset and Code Used
 
 ```{r}
 #| label: load-dataset
@@ -32,42 +26,11 @@ haunted_places <- readr::read_csv('https://raw.githubusercontent.com/rfordatasci
 #| message: false
 ```
 
-## Goal of the Project
-The goal of this project is to explore haunted locations across the U.S., understand their geographical distribution, and analyze the connection between historical significance and the likelihood of hauntings. We aim to identify common types of haunted places and correlate the number of hauntings with population data.
-
-**Dataset Description**
-
-The Haunted Places dataset is obtained from the [TidyTuesday project](https://github.com/rfordatascience/tidytuesday), which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
-
-Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
-
-Dimensions: The dataset contains **10,992 rows** and **10 columns**, with each row representing a unique haunted site across various U.S. states.
-
-**Why This Dataset**
-
-This dataset was chosen for its versatility, combining spatial (latitude, longitude) and descriptive data (haunting descriptions). It allows us to perform geographical analysis and text mining, offering a unique opportunity to explore the geographical distribution of haunted places alongside the rich historical significance tied to them. Additionally, the dataset's diversity in data types (text, coordinates, and location-based data) makes it a good fit for a project requiring both numerical and qualitative analysis.
-
-
-**Key Variables:**
-
-| **variable**   | **class** | **description**                                                                                 |
-|----------------|-----------|-------------------------------------------------------------------------------------------------|
-| city           | character | The city where the place is located.                                                            |
-| country        | character | The country where the place is located (always "United States").                                |
-| description    | character | A text description of the place. The amount of detail in these descriptions is highly variable. |
-| location       | character | A title for the haunted place.                                                                  |
-| state          | character | The US state where the place is located.                                                        |
-| state_abbrev   | character | The two-letter abbreviation for the state.                                                      |
-| longitude      | double    | Longitude of the place.                                                                         |
-| latitude       | double    | Latitude of the place.                                                                          |
-| city_longitude | double    | Longitude of the city center.                                                                   |
-| city_latitude  | double    | Latitude of the city center.                                                                    |
-
-
-The dataset focuses on the United States, with each entry representing a haunted place in various cities and states across the country. This rich combination of geographical and descriptive data allows for an exploration of trends in haunted places, from regional distributions to deeper historical connections.
-
-
-**Creative Visualizations:** With its unique theme, the dataset offers opportunities to create visually striking and thematic data visualizations, such as interactive maps or storytelling through data, making it ideal for engaging projects.
+```{r}
+#| label: load-pkgs
+#| message: false
+library(tidyverse)
+```
 
 '''{r}
 #dimensions of dataset
@@ -88,12 +51,50 @@ State: U.S. state where the site is located.
 Latitude and Longitude: Geographic coordinates for mapping.
 City: Urban or rural location context.
 
-
 '''{r}
 #Data preview
 
 head(haunted_place)
 '''
+
+
+## Goal of the Project
+The goal of this project is to explore haunted locations across the U.S., understand their geographical distribution, and analyze the connection between historical significance and the likelihood of hauntings. We aim to identify common types of haunted places and correlate the number of hauntings with population data.
+
+**Dataset Description**
+
+The Haunted Places dataset is obtained from the [TidyTuesday project](https://github.com/rfordatascience/tidytuesday), which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
+
+Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
+
+Dimensions: The dataset contains **10,992 rows** and **10 columns**, with each row representing a unique haunted site across various U.S. states.
+
+**Why This Dataset**
+
+This dataset was chosen for its versatility, combining spatial (latitude, longitude) and descriptive data (haunting descriptions). It allows us to perform geographical analysis and text mining, offering a unique opportunity to explore the geographical distribution of haunted places alongside the rich historical significance tied to them. Additionally, the dataset's diversity in data types (text, coordinates, and location-based data) makes it a good fit for a project requiring both numerical and qualitative analysis.
+
+
+## Key Variables
+
+| **variable**   | **class** | **description**                                                                                 |
+|----------------|-----------|-------------------------------------------------------------------------------------------------|
+| city           | character | The city where the place is located.                                                            |
+| country        | character | The country where the place is located (always "United States").                                |
+| description    | character | A text description of the place. The amount of detail in these descriptions is highly variable. |
+| location       | character | A title for the haunted place.                                                                  |
+| state          | character | The US state where the place is located.                                                        |
+| state_abbrev   | character | The two-letter abbreviation for the state.                                                      |
+| longitude      | double    | Longitude of the place.                                                                         |
+| latitude       | double    | Latitude of the place.                                                                          |
+| city_longitude | double    | Longitude of the city center.                                                                   |
+| city_latitude  | double    | Latitude of the city center.                                                                    |
+
+
+The dataset focuses on the United States, with each entry representing a haunted place in various cities and states across the country. This rich combination of geographical and descriptive data allows for an exploration of trends in haunted places, from regional distributions to deeper historical connections.
+
+
+**Creative Visualizations:** With its unique theme, the dataset offers opportunities to create visually striking and thematic data visualizations, such as interactive maps or storytelling through data, making it ideal for engaging projects.
+
 
 
 ## Questions
@@ -138,7 +139,7 @@ These approaches will help in understanding both the geographical spread of haun
 |-----------------------------------|-------------|-----------------|--------|-----------|------------------------------------------------------------------------|
 | Choose Dataset & Define Questions | Completed   | Team            | Week 1 | High      | Complete dataset overview and finalize questions.                      |
 | Proposal Draft                    | Completed   | Disha, Sindhu   | Week 2 | High      | Draft proposal with dataset description, questions, and plan.          |
-| Revise Proposal                   | In Progress | Team            | Week 3 | High      | Revise proposal based on feedback.                                     |
+| Revise Proposal                   | In Progress | Sindhu          | Week 3 | High      | Revise proposal based on feedback.                                     |
 | Data Cleaning & Preparation       | Not Started | Sahana, Sindhu  | Week 3 | Moderate  | Clean dataset, handle missing values, merge population data.           |
 | Data Analysis for Question 1      | Not Started | Sahana          | Week 4 | Moderate  | Perform analysis and visualizations for Question 1 (Geographical).     |
 | Data Analysis for Question 2      | Not Started | Sindhu          | Week 4 | High      | Perform analysis and text mining for Question 2 (Historical).          |
