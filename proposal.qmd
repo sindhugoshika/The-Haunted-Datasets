@@ -139,10 +139,10 @@ These approaches will help in understanding both the geographical spread of haun
 |-----------------------------------|-------------|-----------------|--------|-----------|------------------------------------------------------------------------|
 | Choose Dataset & Define Questions | Completed   | Team            | Week 1 | High      | Complete dataset overview and finalize questions.                      |
 | Proposal Draft                    | Completed   | Disha, Sindhu   | Week 2 | High      | Draft proposal with dataset description, questions, and plan.          |
-| Revise Proposal                   | In Progress | Sindhu, Sahana  | Week 3 | High      | Revise proposal based on feedback.                                     |
-| Data Cleaning & Preparation       | Not Started | Sahana, Sindhu  | Week 3 | Moderate  | Clean dataset, handle missing values, merge population data.           |
-| Data Analysis for Question 1      | Not Started | Sahana          | Week 4 | Moderate  | Perform analysis and visualizations for Question 1 (Geographical).     |
-| Data Analysis for Question 2      | Not Started | Sindhu          | Week 4 | High      | Perform analysis and text mining for Question 2 (Historical).          |
+| Revise Proposal                   | Completed   | Sindhu, Sahana  | Week 3 | High      | Revise proposal based on feedback.                                     |
+| Data Cleaning & Preparation       | Completed   | Sahana, Sindhu  | Week 3 | Moderate  | Clean dataset, handle missing values, merge population data.           |
+| Data Analysis for Question 1      | Started     | Sahana          | Week 4 | High      | Perform analysis and visualizations for Question 1 (Geographical).     |
+| Data Analysis for Question 2      | Started     | Sindhu          | Week 4 | High      | Perform analysis and text mining for Question 2 (Historical).          |
 | Draft Report                      | Not Started | Team            | Week 5 | Moderate  | Draft the final report based on findings.                              |
 | Presentation Preparation          | Not Started | Team            | Week 6 | High      | Finalize report, prepare slides, and present findings.                 |
 
