@@ -76,4 +76,211 @@ Provenance: This dataset is crowdsourced from various public sources, including 
 
 Dimensions: The dataset contains **10,992 rows** and **10 columns**, with each row representing a unique haunted site across various U.S. states.
 
-## 
+## Question 1: Geographical Analysis
+
+**Approach:**
+
+To determine the most haunted states and cities, we first visualize the haunted places using longitude and latitude data. We also merge external population data to explore the relationship between state population and the number of haunted places. We plan to create heatmaps and scatter plots to showcase the density of haunted locations and their correlation with population figures.
+
+## Visualizing haunted places across the U.S.
+
+```{r}
+# Define latitude and longitude limits for the contiguous USA
+lat_limits <- c(24.396308, 49.384358)  # South and North bounds
+long_limits <- c(-125.0, -66.93457)    # West and East bounds
+
+# Remove outliers based on defined limits
+haunted_clean_filtered <- haunted_clean %>%
+  filter(latitude >= lat_limits[1], latitude <= lat_limits[2],
+         longitude >= long_limits[1], longitude <= long_limits[2])
+
+# Create a map outline of the USA
+usa_map <- map_data("state")
+
+# Plotting the outline map with haunted places
+ggplot() +
+  geom_polygon(data = usa_map, aes(x = long, y = lat, group = group), fill = "white", color = "black", size = 0.5) +  # Outline of the USA
+  geom_point(data = haunted_clean_filtered, aes(x = longitude, y = latitude), 
+             color = "darkred", size = 3, alpha = 0.7, shape = 21, fill = "red") +  # Points for haunted places
+  labs(title = "Haunted Places in the USA", 
+       subtitle = "Visualizing the Spooky Locations Across the States",
+       x = "Longitude", 
+       y = "Latitude") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 20, face = "bold"),
+        plot.subtitle = element_text(size = 14, face = "italic"),
+        axis.text = element_text(size = 12))
+```
+
+## Haunted locations by state
+
+```{r}
+ # URL or local path for a ghost icon image
+ghost_icon <- "https://img.icons8.com/?size=80&id=3T4nzAVK6IRW&format=png"  
+
+# Top 10 haunted states
+top_haunted_states <- haunted_clean %>%
+  count(state_abbrev, sort = TRUE) %>%
+  top_n(10, n) %>%
+  mutate(type = "State")
+
+# Top 10 haunted cities
+top_haunted_cities <- haunted_clean %>%
+  count(city, sort = TRUE) %>%
+  top_n(10, n) %>%
+  mutate(type = "City")
+
+# Combine both dataframes
+haunted_combined <- bind_rows(
+  top_haunted_states %>% rename(location = state_abbrev),
+  top_haunted_cities %>% rename(location = city)
+)
+
+# Add ghost icon URL to each row
+haunted_combined <- haunted_combined %>%
+  mutate(icon = ghost_icon)
+
+# Lollipop plot with ghost icons
+ggplot(haunted_combined, aes(x = reorder(location, n), y = n)) +
+  geom_segment(aes(xend = location, y = 0, yend = n), color = "red", size = 1.5) +  
+  ggimage::geom_image(aes(image = icon), size = 0.07) +  # Ghost icon instead of circles
+  facet_wrap(~type, scales = "free", ncol = 2, strip.position = "top") +
+  coord_flip() +
+  labs(title = "Top 10 Haunted States and Cities by Number of Locations") + 
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold", size = 12),    # Bold labels for State and City
+    axis.text.x = element_text(size = 10),                  # X-axis text size
+    axis.text.y = element_text(face = "bold", size = 10),   # Bold Y-axis labels (State/City names)
+    plot.title = element_text(size = 16, face = "bold"),    # Bold title
+    legend.position = "none",                               # Remove the legend
+    panel.spacing = unit(4, "lines"),                       # Gap between the two plots
+    axis.title.x = element_blank(),                         # Remove x-axis title
+    axis.title.y = element_blank()                          # Remove y-axis title
+  )
+```
+
+## Correlating haunted places with state population
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(readr)
+library(janitor)
+
+# Load population data
+population_data <- read_csv("Haunted_Data_population.csv")  
+# Clean column names in population data
+population_data <- population_data %>%
+  clean_names()
+
+# Check column names to verify the state and population columns
+print(colnames(population_data))
+
+# Count the number of haunted places by state
+haunted_counts_state <- haunted_places %>%
+  group_by(state) %>%
+  summarise(haunted_places_count = n()) %>%
+  arrange(desc(haunted_places_count)) %>%
+  head(10)  # Get the top 10 haunted states
+
+# Extract the top 10 haunted states
+top_haunted_states <- haunted_counts_state$state
+
+# Check for unique state names in population data to match with haunted states
+print(unique(population_data$name)) 
+
+# Filter the population data for the top 10 haunted states
+population_top_haunted <- population_data %>%
+  filter(name %in% top_haunted_states) 
+
+
+population_top_haunted <- population_top_haunted %>%
+  rename(population = p1_001n)  # Adjust 'population_column_name' accordingly
+
+# Merge haunted places count with the population data
+haunted_population <- haunted_counts_state %>%
+  left_join(population_top_haunted, by = c("state" = "name"))
+
+# Display the merged result to verify
+print(haunted_population)
+
+# Check the structure to verify correct column names and types
+str(haunted_population)
+
+# Convert population and haunted places count to numeric (if needed)
+haunted_population$population <- as.numeric(haunted_population$population)
+haunted_population$haunted_places_count <- as.numeric(haunted_population$haunted_places_count)
+
+# Check for NA values or non-numeric entries
+summary(haunted_population$population)
+summary(haunted_population$haunted_places_count)
+
+# Remove rows with NA values
+haunted_population_clean <- haunted_population %>%
+  filter(!is.na(population) & !is.na(haunted_places_count))
+
+# Check the cleaned data
+print(haunted_population_clean)
+
+# Calculate and print correlation between population and number of haunted places
+correlation <- cor(haunted_population_clean$population, haunted_population_clean$haunted_places_count)
+print(correlation)
+```
+
+```{r}
+library(scales)
+# Enhanced Bar plot with more visible population bars
+enhanced_bar_plot <- ggplot(haunted_population_clean, aes(x = reorder(state, haunted_places_count))) +
+  # Haunted places bar
+  geom_bar(aes(y = haunted_places_count), stat = "identity", fill = "darkblue", width = 0.2) +
+  geom_text(aes(y = haunted_places_count, label = haunted_places_count), 
+            vjust = -0.5, color = "white", size = 3) +
+  
+  # Population bar scaled down and placed beside haunted places
+  geom_bar(aes(y = population / 100000), stat = "identity", fill = "orange", width = 0.3, 
+           position = position_nudge(x = 0.4)) +  # Decreased divisor for better visibility
+  
+  # Labels and title
+  labs(
+    title = "Population and Haunted Places in Top 10 States",
+    x = "State",
+    y = "Count (Number of Haunted Places)",
+    fill = "Legend"
+  ) +
+  
+  # Secondary y-axis for population with adjusted limits
+  scale_y_continuous(
+    name = "Number of Haunted Places",
+    sec.axis = sec_axis(~ . * 100000, name = "Population", 
+                        labels = label_number(big.mark = ",", decimal.mark = ".", scale = 1))  
+  ) +
+  
+  # Aesthetics and theme adjustments
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    axis.text.x = element_text(size = 12, angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "bottom"  # Position for legend
+  ) +
+  scale_fill_manual(values = c("darkblue" = "darkblue", "orange" = "orange"), 
+                    labels = c("Haunted Places", "Population"), 
+                    name = "Legend")  # Add a legend
+
+# Display the enhanced bar plot
+print(enhanced_bar_plot)
+
+
+# Calculate and print correlation between population and number of haunted places
+correlation <- cor(haunted_population_clean$population, haunted_population_clean$haunted_places_count)
+print(correlation)
+```
+
+## Observation:
+
+Initial observations suggest that certain states, like California and Texas, have a higher concentration of haunted sites.
+
+Upon merging population data, we will examine whether more populous states also report more hauntings or if there are regional factors contributing to these concentrations.
