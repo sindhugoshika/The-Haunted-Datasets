@@ -1,11 +1,15 @@
 ---
-title: "Project Title"
+title: "Haunted Places in the United States"
 subtitle: "INFO 526 - Fall 2024 - Project 01"
 author: 
-  - name: "Team name"
+  - name: "The Data Drafters"
     affiliations:
       - name: "School of Information, University of Arizona"
-description: "Project description"
+description: "The Haunted Places dataset is obtained from the TidyTuesday project, which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
+
+Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
+
+Dimensions: The dataset contains 10,992 rows and 10 columns, with each row representing a unique haunted site across various U.S. states."
 format:
    html:
     code-tools: true
@@ -19,4 +23,57 @@ execute:
 
 ## Abstract
 
-Add project abstract here.
+The Haunted Places Dataset is a comprehensive compilation of 10,992 haunted locations across the United States, designed to facilitate exploration and analysis of cultural, historical, and geographical phenomena associated with hauntings. Each entry in the dataset includes key attributes such as city, state, description, and geographical coordinates (longitude and latitude), enabling a multi-dimensional analysis of haunted places. The dataset provides insights into regional distributions of hauntings, allowing for geographical mapping and the identification of hotspots. Additionally, it supports investigations into the historical significance of haunted locations by correlating narratives with geographical data. By leveraging this dataset, researchers and enthusiasts can delve into the rich tapestry of ghost stories, folklore, and historical events tied to these eerie sites, making it a valuable resource for academic studies, tourism development, and cultural analysis.
+
+## Introduction
+
+The Haunted Places Dataset provides a rich collection of haunted locations across the United States, with 10,992 rows and 10 columns detailing various attributes of these sites. Each entry represents a haunted location, offering insights through attributes such as the city, state, description, and geographical coordinates (longitude and latitude). This dataset is valuable for exploring the cultural, historical, and geographical aspects of hauntings, enabling analysis of trends and patterns in haunted locations.
+
+The dataset offers opportunities for visualizing the geographical distribution of haunted places, understanding regional trends, and even linking hauntings to historical events or local folklore. Whether for research, storytelling, or tourism-related projects, this dataset provides a unique perspective on the haunted history of the United States.
+
+```{r}
+# Load necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(tidytext)
+library(ggridges)
+library(wordcloud2)
+library(sf)  # For spatial analysis and maps
+library(tmap)
+library(leaflet)
+library(ggrepel)
+library(dplyr)
+library(maps)
+library(gganimate)
+library(ggimage)
+```
+
+```{r}
+# Load the dataset
+haunted_places <- read_csv('haunted_places.csv')
+
+```
+
+```{r}
+# View basic summary
+summary(haunted_places)
+
+```
+
+```{r}
+# Handling missing data: Drop rows with missing longitude or latitude
+haunted_clean <- haunted_places %>%
+  filter(!is.na(longitude) & !is.na(latitude))
+
+```
+
+## Dataset Description
+
+The Haunted Places dataset is obtained from the [TidyTuesday project](https://github.com/rfordatascience/tidytuesday), which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
+
+Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
+
+Dimensions: The dataset contains **10,992 rows** and **10 columns**, with each row representing a unique haunted site across various U.S. states.
+
+## 
