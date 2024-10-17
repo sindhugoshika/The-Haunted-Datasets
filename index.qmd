@@ -284,3 +284,136 @@ print(correlation)
 Initial observations suggest that certain states, like California and Texas, have a higher concentration of haunted sites.
 
 Upon merging population data, we will examine whether more populous states also report more hauntings or if there are regional factors contributing to these concentrations.
+
+## Question 2: Historical Significance**
+
+**Approach:**
+
+Using the description column in the dataset, we apply text mining techniques to classify haunted places based on historical significance. By performing word frequency analysis and sentiment analysis, we aim to determine whether locations with richer historical details, such as battlefields or cemeteries, are more frequently haunted. This analysis also involves categorizing the types of haunted locations based on common themes derived from the descriptions.
+
+## Text mining on the description column
+
+```{r}
+# Tokenize the description column and perform word frequency analysis
+description_words <- haunted_clean %>%
+  unnest_tokens(word, description) %>%
+  count(word, sort = TRUE)
+
+# Remove common stop words
+description_words <- description_words %>%
+  anti_join(stop_words)
+
+# Display the most frequent words in descriptions
+head(description_words)
+
+# Customize the word cloud for a haunted, eerie effect
+wordcloud2(description_words, 
+           size = 1,                     # Slightly larger size for visibility
+           color = "random-dark",         # Dark color theme for a spooky effect
+           backgroundColor = "red",     # red background for a haunted feel
+           fontFamily = "Creepster",      # Use a creepy or horror-style font 
+           shape = "circle"               # Circular shape to give a haunting, supernatural look
+)
+
+
+```
+
+## Classifying haunted places by historical theme
+
+```{r}
+# Extending the keyword-based classification of haunted places
+haunted_categories <- haunted_clean %>%
+  mutate(category = case_when(
+    str_detect(description, "cemetery|grave|tomb") ~ "Cemetery",
+    str_detect(description, "battle|war|fort|soldier") ~ "Battlefield",
+    str_detect(description, "asylum|hospital|sanatorium") ~ "Asylum/Hospital",
+    str_detect(description, "prison|jail") ~ "Prison",
+    str_detect(description, "church|chapel|monastery") ~ "Religious Place",
+    str_detect(description, "hotel|inn|motel|lodging") ~ "Hotel",
+    str_detect(description, "school|university|college") ~ "School/University",
+    str_detect(description, "house|mansion|estate") ~ "Residential",
+    TRUE ~ NA_character_  # Assign NA for unmatched cases
+  )) %>%
+  filter(!is.na(category))  # Remove rows with NA in 'category'
+
+# Bar plot of haunted places by category
+ggplot(haunted_categories, aes(x = category, fill = category)) +
+  geom_bar() +
+  labs(title = "Types of Haunted Locations Based on Description",
+       x = "Category", y = "Count") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Tilt x-axis labels for readability
+    plot.title = element_text(size = 14, face = "bold")  # Larger title
+  )
+```
+
+## Sentiment analysis of descriptions
+
+```{r}
+# Perform sentiment analysis on descriptions
+haunted_sentiment <- haunted_clean %>%
+  unnest_tokens(word, description) %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentiment, sort = TRUE)
+
+# Bar plot showing sentiment analysis results
+ggplot(haunted_sentiment, aes(x = sentiment, y = n, fill = sentiment)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Sentiment Analysis of Haunted Place Descriptions",
+       x = "Sentiment", y = "Count") +
+  theme_minimal()
+
+```
+
+## Haunted Places in Tucson from our Data Set
+
+```{r}
+# Check if there are any haunted places in Tucson
+tucson_haunted <- haunted_clean %>%
+  filter(str_detect(city, regex("Tucson", ignore_case = TRUE)))
+
+# View the results
+tucson_haunted
+
+```
+
+```{r}
+# Count haunted places by location in Tucson
+tucson_haunted_count <- tucson_haunted %>%
+  count(location)
+
+# View the results to ensure it's working
+print(tucson_haunted_count)
+```
+
+```{r}
+
+# Load required libraries
+library(ggplot2)
+
+# Assuming `tucson_haunted_count` has the haunted places information
+
+# Plot haunted places with a muted orange palette and enhanced text contrast
+ggplot(tucson_haunted_count, aes(x = 1, y = reorder(location, n), fill = location)) +
+  geom_tile(color = "white", size = 0.1) +  # Add colored tiles
+  geom_text(aes(label = location), size = 4, color = "black", fontface = "bold") +  # Label the places with better contrast
+  scale_fill_manual(values = colorRampPalette(c("#ffcc80", "#ffa726", "#f57c00"))(length(unique(tucson_haunted_count$location)))) +  # Orange gradient
+  labs(title = "Haunted Places in Tucson") +
+  theme_void() +  # Remove axes and background
+  theme(
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+    legend.position = "none"  # Hide legend
+  )
+
+```
+
+**Observation:**
+
+Preliminary text mining reveals that certain types of locations, such as schools, theaters, and cemeteries, are commonly associated with hauntings.
+
+We observe that detailed historical backgrounds, particularly those linked to tragic events, are often more prevalent in the descriptions of the most haunted sites.
+
+## Conclusion:
+
+This project successfully identifies patterns in the geographical and historical distribution of haunted locations across the United States. By merging external population data, we have begun to explore how population size correlates with the number of haunted places in each state. Text mining has allowed us to delve into the descriptive data, highlighting the connection between historical significance and the likelihood of hauntings. Further analysis will focus on refining these insights and expanding on the relationships discovered through our visualizations and models.
