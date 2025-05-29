@@ -1,0 +1,14 @@
+---
+title: "About"
+format: html
+editor: visual
+---
+
+This project was developed by **The Data Drafters** For [INFO 526 - Data Analysis and Visualization](https://datavizaz.org/) at the University of Arizona, taught by Prof.Anna R.Leach The team is comprised of the following team members.
+
+-   Disha: Master’s student in Information Science.
+
+-   Sindhu Goshika:  Master’s student in Information Science.
+
+-   Sahana Santhosh:  Master’s student in Information Science.
+

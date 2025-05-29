@@ -1,0 +1,419 @@
+---
+title: "Haunted Places in the United States"
+subtitle: "INFO 526 - Fall 2024 - Project 01"
+author: 
+  - name: "The Data Drafters"
+    affiliations:
+      - name: "School of Information, University of Arizona"
+description: "The Haunted Places dataset is obtained from the TidyTuesday project, which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
+
+Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
+
+Dimensions: The dataset contains 10,992 rows and 10 columns, with each row representing a unique haunted site across various U.S. states."
+format:
+   html:
+    code-tools: true
+    code-overflow: wrap
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  echo: false
+---
+
+## Abstract
+
+The Haunted Places Dataset is a comprehensive compilation of 10,992 haunted locations across the United States, designed to facilitate exploration and analysis of cultural, historical, and geographical phenomena associated with hauntings. Each entry in the dataset includes key attributes such as city, state, description, and geographical coordinates (longitude and latitude), enabling a multi-dimensional analysis of haunted places. The dataset provides insights into regional distributions of hauntings, allowing for geographical mapping and the identification of hotspots. Additionally, it supports investigations into the historical significance of haunted locations by correlating narratives with geographical data. By leveraging this dataset, researchers and enthusiasts can delve into the rich tapestry of ghost stories, folklore, and historical events tied to these eerie sites, making it a valuable resource for academic studies, tourism development, and cultural analysis.
+
+## Introduction
+
+The Haunted Places Dataset provides a rich collection of haunted locations across the United States, with 10,992 rows and 10 columns detailing various attributes of these sites. Each entry represents a haunted location, offering insights through attributes such as the city, state, description, and geographical coordinates (longitude and latitude). This dataset is valuable for exploring the cultural, historical, and geographical aspects of hauntings, enabling analysis of trends and patterns in haunted locations.
+
+The dataset offers opportunities for visualizing the geographical distribution of haunted places, understanding regional trends, and even linking hauntings to historical events or local folklore. Whether for research, storytelling, or tourism-related projects, this dataset provides a unique perspective on the haunted history of the United States.
+
+```{r}
+# Load necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(tidytext)
+library(ggridges)
+library(wordcloud2)
+library(sf)  # For spatial analysis and maps
+library(tmap)
+library(leaflet)
+library(ggrepel)
+library(dplyr)
+library(maps)
+library(gganimate)
+library(ggimage)
+```
+
+```{r}
+# Load the dataset
+haunted_places <- read_csv('haunted_places.csv')
+
+```
+
+```{r}
+# View basic summary
+summary(haunted_places)
+
+```
+
+```{r}
+# Handling missing data: Drop rows with missing longitude or latitude
+haunted_clean <- haunted_places %>%
+  filter(!is.na(longitude) & !is.na(latitude))
+
+```
+
+## Dataset Description
+
+The Haunted Places dataset is obtained from the [TidyTuesday project](https://github.com/rfordatascience/tidytuesday), which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
+
+Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
+
+Dimensions: The dataset contains **10,992 rows** and **10 columns**, with each row representing a unique haunted site across various U.S. states.
+
+## Question 1: Geographical Analysis
+
+**Approach:**
+
+To determine the most haunted states and cities, we first visualize the haunted places using longitude and latitude data. We also merge external population data to explore the relationship between state population and the number of haunted places. We plan to create heatmaps and scatter plots to showcase the density of haunted locations and their correlation with population figures.
+
+## Visualizing haunted places across the U.S.
+
+```{r}
+# Define latitude and longitude limits for the contiguous USA
+lat_limits <- c(24.396308, 49.384358)  # South and North bounds
+long_limits <- c(-125.0, -66.93457)    # West and East bounds
+
+# Remove outliers based on defined limits
+haunted_clean_filtered <- haunted_clean %>%
+  filter(latitude >= lat_limits[1], latitude <= lat_limits[2],
+         longitude >= long_limits[1], longitude <= long_limits[2])
+
+# Create a map outline of the USA
+usa_map <- map_data("state")
+
+# Plotting the outline map with haunted places
+ggplot() +
+  geom_polygon(data = usa_map, aes(x = long, y = lat, group = group), fill = "white", color = "black", size = 0.5) +  # Outline of the USA
+  geom_point(data = haunted_clean_filtered, aes(x = longitude, y = latitude), 
+             color = "darkred", size = 3, alpha = 0.7, shape = 21, fill = "red") +  # Points for haunted places
+  labs(title = "Haunted Places in the USA", 
+       subtitle = "Visualizing the Spooky Locations Across the States",
+       x = "Longitude", 
+       y = "Latitude") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 20, face = "bold"),
+        plot.subtitle = element_text(size = 14, face = "italic"),
+        axis.text = element_text(size = 12))
+```
+
+## Haunted locations by state
+
+```{r}
+ # URL or local path for a ghost icon image
+ghost_icon <- "https://img.icons8.com/?size=80&id=3T4nzAVK6IRW&format=png"  
+
+# Top 10 haunted states
+top_haunted_states <- haunted_clean %>%
+  count(state_abbrev, sort = TRUE) %>%
+  top_n(10, n) %>%
+  mutate(type = "State")
+
+# Top 10 haunted cities
+top_haunted_cities <- haunted_clean %>%
+  count(city, sort = TRUE) %>%
+  top_n(10, n) %>%
+  mutate(type = "City")
+
+# Combine both dataframes
+haunted_combined <- bind_rows(
+  top_haunted_states %>% rename(location = state_abbrev),
+  top_haunted_cities %>% rename(location = city)
+)
+
+# Add ghost icon URL to each row
+haunted_combined <- haunted_combined %>%
+  mutate(icon = ghost_icon)
+
+# Lollipop plot with ghost icons
+ggplot(haunted_combined, aes(x = reorder(location, n), y = n)) +
+  geom_segment(aes(xend = location, y = 0, yend = n), color = "red", size = 1.5) +  
+  ggimage::geom_image(aes(image = icon), size = 0.07) +  # Ghost icon instead of circles
+  facet_wrap(~type, scales = "free", ncol = 2, strip.position = "top") +
+  coord_flip() +
+  labs(title = "Top 10 Haunted States and Cities by Number of Locations") + 
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold", size = 12),    # Bold labels for State and City
+    axis.text.x = element_text(size = 10),                  # X-axis text size
+    axis.text.y = element_text(face = "bold", size = 10),   # Bold Y-axis labels (State/City names)
+    plot.title = element_text(size = 16, face = "bold"),    # Bold title
+    legend.position = "none",                               # Remove the legend
+    panel.spacing = unit(4, "lines"),                       # Gap between the two plots
+    axis.title.x = element_blank(),                         # Remove x-axis title
+    axis.title.y = element_blank()                          # Remove y-axis title
+  )
+```
+
+## Correlating haunted places with state population
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(readr)
+library(janitor)
+
+# Load population data
+population_data <- read_csv("Haunted_Data_population.csv")  
+# Clean column names in population data
+population_data <- population_data %>%
+  clean_names()
+
+# Check column names to verify the state and population columns
+print(colnames(population_data))
+
+# Count the number of haunted places by state
+haunted_counts_state <- haunted_places %>%
+  group_by(state) %>%
+  summarise(haunted_places_count = n()) %>%
+  arrange(desc(haunted_places_count)) %>%
+  head(10)  # Get the top 10 haunted states
+
+# Extract the top 10 haunted states
+top_haunted_states <- haunted_counts_state$state
+
+# Check for unique state names in population data to match with haunted states
+print(unique(population_data$name)) 
+
+# Filter the population data for the top 10 haunted states
+population_top_haunted <- population_data %>%
+  filter(name %in% top_haunted_states) 
+
+
+population_top_haunted <- population_top_haunted %>%
+  rename(population = p1_001n)  # Adjust 'population_column_name' accordingly
+
+# Merge haunted places count with the population data
+haunted_population <- haunted_counts_state %>%
+  left_join(population_top_haunted, by = c("state" = "name"))
+
+# Display the merged result to verify
+print(haunted_population)
+
+# Check the structure to verify correct column names and types
+str(haunted_population)
+
+# Convert population and haunted places count to numeric (if needed)
+haunted_population$population <- as.numeric(haunted_population$population)
+haunted_population$haunted_places_count <- as.numeric(haunted_population$haunted_places_count)
+
+# Check for NA values or non-numeric entries
+summary(haunted_population$population)
+summary(haunted_population$haunted_places_count)
+
+# Remove rows with NA values
+haunted_population_clean <- haunted_population %>%
+  filter(!is.na(population) & !is.na(haunted_places_count))
+
+# Check the cleaned data
+print(haunted_population_clean)
+
+# Calculate and print correlation between population and number of haunted places
+correlation <- cor(haunted_population_clean$population, haunted_population_clean$haunted_places_count)
+print(correlation)
+```
+
+```{r}
+library(scales)
+# Enhanced Bar plot with more visible population bars
+enhanced_bar_plot <- ggplot(haunted_population_clean, aes(x = reorder(state, haunted_places_count))) +
+  # Haunted places bar
+  geom_bar(aes(y = haunted_places_count), stat = "identity", fill = "darkblue", width = 0.2) +
+  geom_text(aes(y = haunted_places_count, label = haunted_places_count), 
+            vjust = -0.5, color = "white", size = 3) +
+  
+  # Population bar scaled down and placed beside haunted places
+  geom_bar(aes(y = population / 100000), stat = "identity", fill = "orange", width = 0.3, 
+           position = position_nudge(x = 0.4)) +  # Decreased divisor for better visibility
+  
+  # Labels and title
+  labs(
+    title = "Population and Haunted Places in Top 10 States",
+    x = "State",
+    y = "Count (Number of Haunted Places)",
+    fill = "Legend"
+  ) +
+  
+  # Secondary y-axis for population with adjusted limits
+  scale_y_continuous(
+    name = "Number of Haunted Places",
+    sec.axis = sec_axis(~ . * 100000, name = "Population", 
+                        labels = label_number(big.mark = ",", decimal.mark = ".", scale = 1))  
+  ) +
+  
+  # Aesthetics and theme adjustments
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    axis.text.x = element_text(size = 12, angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+    legend.position = "bottom"  # Position for legend
+  ) +
+  scale_fill_manual(values = c("darkblue" = "darkblue", "orange" = "orange"), 
+                    labels = c("Haunted Places", "Population"), 
+                    name = "Legend")  # Add a legend
+
+# Display the enhanced bar plot
+print(enhanced_bar_plot)
+
+
+# Calculate and print correlation between population and number of haunted places
+correlation <- cor(haunted_population_clean$population, haunted_population_clean$haunted_places_count)
+print(correlation)
+```
+
+## Observation:
+
+Initial observations suggest that certain states, like California and Texas, have a higher concentration of haunted sites.
+
+Upon merging population data, we will examine whether more populous states also report more hauntings or if there are regional factors contributing to these concentrations.
+
+## Question 2: Historical Significance**
+
+**Approach:**
+
+Using the description column in the dataset, we apply text mining techniques to classify haunted places based on historical significance. By performing word frequency analysis and sentiment analysis, we aim to determine whether locations with richer historical details, such as battlefields or cemeteries, are more frequently haunted. This analysis also involves categorizing the types of haunted locations based on common themes derived from the descriptions.
+
+## Text mining on the description column
+
+```{r}
+# Tokenize the description column and perform word frequency analysis
+description_words <- haunted_clean %>%
+  unnest_tokens(word, description) %>%
+  count(word, sort = TRUE)
+
+# Remove common stop words
+description_words <- description_words %>%
+  anti_join(stop_words)
+
+# Display the most frequent words in descriptions
+head(description_words)
+
+# Customize the word cloud for a haunted, eerie effect
+wordcloud2(description_words, 
+           size = 1,                     # Slightly larger size for visibility
+           color = "random-dark",         # Dark color theme for a spooky effect
+           backgroundColor = "red",     # red background for a haunted feel
+           fontFamily = "Creepster",      # Use a creepy or horror-style font 
+           shape = "circle"               # Circular shape to give a haunting, supernatural look
+)
+
+
+```
+
+## Classifying haunted places by historical theme
+
+```{r}
+# Extending the keyword-based classification of haunted places
+haunted_categories <- haunted_clean %>%
+  mutate(category = case_when(
+    str_detect(description, "cemetery|grave|tomb") ~ "Cemetery",
+    str_detect(description, "battle|war|fort|soldier") ~ "Battlefield",
+    str_detect(description, "asylum|hospital|sanatorium") ~ "Asylum/Hospital",
+    str_detect(description, "prison|jail") ~ "Prison",
+    str_detect(description, "church|chapel|monastery") ~ "Religious Place",
+    str_detect(description, "hotel|inn|motel|lodging") ~ "Hotel",
+    str_detect(description, "school|university|college") ~ "School/University",
+    str_detect(description, "house|mansion|estate") ~ "Residential",
+    TRUE ~ NA_character_  # Assign NA for unmatched cases
+  )) %>%
+  filter(!is.na(category))  # Remove rows with NA in 'category'
+
+# Bar plot of haunted places by category
+ggplot(haunted_categories, aes(x = category, fill = category)) +
+  geom_bar() +
+  labs(title = "Types of Haunted Locations Based on Description",
+       x = "Category", y = "Count") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Tilt x-axis labels for readability
+    plot.title = element_text(size = 14, face = "bold")  # Larger title
+  )
+```
+
+## Sentiment analysis of descriptions
+
+```{r}
+# Perform sentiment analysis on descriptions
+haunted_sentiment <- haunted_clean %>%
+  unnest_tokens(word, description) %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentiment, sort = TRUE)
+
+# Bar plot showing sentiment analysis results
+ggplot(haunted_sentiment, aes(x = sentiment, y = n, fill = sentiment)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Sentiment Analysis of Haunted Place Descriptions",
+       x = "Sentiment", y = "Count") +
+  theme_minimal()
+
+```
+
+## Haunted Places in Tucson from our Data Set
+
+```{r}
+# Check if there are any haunted places in Tucson
+tucson_haunted <- haunted_clean %>%
+  filter(str_detect(city, regex("Tucson", ignore_case = TRUE)))
+
+# View the results
+tucson_haunted
+
+```
+
+```{r}
+# Count haunted places by location in Tucson
+tucson_haunted_count <- tucson_haunted %>%
+  count(location)
+
+# View the results to ensure it's working
+print(tucson_haunted_count)
+```
+
+```{r}
+
+# Load required libraries
+library(ggplot2)
+
+# Assuming `tucson_haunted_count` has the haunted places information
+
+# Plot haunted places with a muted orange palette and enhanced text contrast
+ggplot(tucson_haunted_count, aes(x = 1, y = reorder(location, n), fill = location)) +
+  geom_tile(color = "white", size = 0.1) +  # Add colored tiles
+  geom_text(aes(label = location), size = 4, color = "black", fontface = "bold") +  # Label the places with better contrast
+  scale_fill_manual(values = colorRampPalette(c("#ffcc80", "#ffa726", "#f57c00"))(length(unique(tucson_haunted_count$location)))) +  # Orange gradient
+  labs(title = "Haunted Places in Tucson") +
+  theme_void() +  # Remove axes and background
+  theme(
+    plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+    legend.position = "none"  # Hide legend
+  )
+
+```
+
+**Observation:**
+
+Preliminary text mining reveals that certain types of locations, such as schools, theaters, and cemeteries, are commonly associated with hauntings.
+
+We observe that detailed historical backgrounds, particularly those linked to tragic events, are often more prevalent in the descriptions of the most haunted sites.
+
+## Conclusion:
+
+This project successfully identifies patterns in the geographical and historical distribution of haunted locations across the United States. By merging external population data, we have begun to explore how population size correlates with the number of haunted places in each state. Text mining has allowed us to delve into the descriptive data, highlighting the connection between historical significance and the likelihood of hauntings. Further analysis will focus on refining these insights and expanding on the relationships discovered through our visualizations and models.

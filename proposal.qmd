@@ -1,0 +1,149 @@
+---
+title: "Haunted Places in the United States"
+subtitle: "Proposal"
+author: 
+  - name: "The Data Drafters"
+    affiliations:
+      - name: "College of Information Science, University of Arizona"
+description: "Project description"
+format:
+  html:
+    code-tools: true
+    code-overflow: wrap
+    code-line-numbers: true
+    embed-resources: true
+editor: visual
+code-annotations: hover
+execute:
+  warning: false
+---
+
+## Dataset and Code Used
+
+```{r}
+#| label: load-dataset
+haunted_places <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-10-10/haunted_places.csv')
+#| message: false
+```
+
+```{r}
+#| label: load-pkgs
+#| message: false
+library(tidyverse)
+```
+
+'''{r}
+#dimensions of dataset
+
+dim(haunted_places)
+'''
+
+'''{r}
+#Summary of dataset
+
+summary(haunted_places)
+'''
+The dataset includes a variety of variables such as
+
+Location: Name or title of the haunted site.
+Description: Details of the haunting events.
+State: U.S. state where the site is located.
+Latitude and Longitude: Geographic coordinates for mapping.
+City: Urban or rural location context.
+
+'''{r}
+#Data preview
+
+head(haunted_place)
+'''
+
+
+## Goal of the Project
+The goal of this project is to explore haunted locations across the U.S., understand their geographical distribution, and analyze the connection between historical significance and the likelihood of hauntings. We aim to identify common types of haunted places and correlate the number of hauntings with population data.
+
+**Dataset Description**
+
+The Haunted Places dataset is obtained from the [TidyTuesday project](https://github.com/rfordatascience/tidytuesday), which collects public datasets for analysis. This particular dataset, released in October 2023, includes information on over 10,000 haunted locations across the United States.
+
+Provenance: This dataset is crowdsourced from various public sources, including websites and historical records about haunted locations. The data is openly available for public use and analysis, making it suitable for this project.
+
+Dimensions: The dataset contains **10,992 rows** and **10 columns**, with each row representing a unique haunted site across various U.S. states.
+
+**Why This Dataset**
+
+This dataset was chosen for its versatility, combining spatial (latitude, longitude) and descriptive data (haunting descriptions). It allows us to perform geographical analysis and text mining, offering a unique opportunity to explore the geographical distribution of haunted places alongside the rich historical significance tied to them. Additionally, the dataset's diversity in data types (text, coordinates, and location-based data) makes it a good fit for a project requiring both numerical and qualitative analysis.
+
+
+## Key Variables
+
+| **variable**   | **class** | **description**                                                                                 |
+|----------------|-----------|-------------------------------------------------------------------------------------------------|
+| city           | character | The city where the place is located.                                                            |
+| country        | character | The country where the place is located (always "United States").                                |
+| description    | character | A text description of the place. The amount of detail in these descriptions is highly variable. |
+| location       | character | A title for the haunted place.                                                                  |
+| state          | character | The US state where the place is located.                                                        |
+| state_abbrev   | character | The two-letter abbreviation for the state.                                                      |
+| longitude      | double    | Longitude of the place.                                                                         |
+| latitude       | double    | Latitude of the place.                                                                          |
+| city_longitude | double    | Longitude of the city center.                                                                   |
+| city_latitude  | double    | Latitude of the city center.                                                                    |
+
+
+The dataset focuses on the United States, with each entry representing a haunted place in various cities and states across the country. This rich combination of geographical and descriptive data allows for an exploration of trends in haunted places, from regional distributions to deeper historical connections.
+
+
+**Creative Visualizations:** With its unique theme, the dataset offers opportunities to create visually striking and thematic data visualizations, such as interactive maps or storytelling through data, making it ideal for engaging projects.
+
+
+
+## Questions
+
+1. **Geographical Analysis:** What are the most haunted states and cities in the United States? Is there a relationship between a state's population and the number of haunted locations?
+
+**Plan:** 
+- Use the geographical data (longitude, latitude, state, city) to visualize haunted places across the U.S.
+- Merge external population data for each state to explore the relationship between population and the number of haunted locations.
+- Create visualizations (heatmaps, scatter plots) to show the density of haunted places and their correlation with population.
+
+**Variables involved:** state, city, longitude, latitude, state_abbrev, **external population data** (to be merged).
+
+**Types of Visualization:**
+- We will create a **heatmap** to show the distribution of haunted places across states and cities.
+- A **scatter plot** will be used to visualize the relationship between state population and the number of haunted places. 
+- A **correlation analysis** will be performed to assess the relationship between population density and the number of haunted locations.
+
+
+
+2. **Historical Significance:** Do locations with detailed historical backgrounds in the description tend to be more haunted? Are there certain types of places (e.g., cemeteries, public buildings) that have more frequent hauntings based on the description data?
+
+**Plan:** 
+1. Perform text analysis on the "description" column to classify haunted places based on historical details.
+2. Explore whether certain types of locations (e.g., cemeteries, battlefields) are more frequently associated with hauntings.
+3. Use word frequency analysis and text mining to derive common historical themes and classify the level of historical significance.
+4. To classify supernatural types, we will use **natural language processing (NLP)** techniques. Specific keywords (e.g., "ghost," "apparition," "haunted house") will be extracted from the "description" column using **word frequency analysis** or **sentiment analysis**. We will categorize each haunted location based on these extracted keywords to identify patterns in the types of hauntings.
+
+
+**Variables involved:** description, location. **New variables** may be created from text mining to classify haunted sites into categories based on the description (e.g., age, type of location).
+
+**Types of Visualization:**
+- We will perform **text mining** using techniques like **TF-IDF** or **word cloud analysis** to classify the historical significance of haunted sites based on the "description" field.
+- Text categories will be generated for historical themes (e.g., battlefields, cemeteries), and **bar plots** will be used to compare the frequency of haunting types.
+
+
+These approaches will help in understanding both the geographical spread of haunted places and the historical significance tied to these locations.
+
+## Work Assignment
+
+| Task Name                         | Status      | Assignee        | Due    | Priority  | Summary                                                                |
+|-----------------------------------|-------------|-----------------|--------|-----------|------------------------------------------------------------------------|
+| Choose Dataset & Define Questions | Completed   | Team            | Week 1 | High      | Complete dataset overview and finalize questions.                      |
+| Proposal Draft                    | Completed   | Disha, Sindhu   | Week 2 | High      | Draft proposal with dataset description, questions, and plan.          |
+| Revise Proposal                   | Completed   | Sindhu, Sahana  | Week 3 | High      | Revise proposal based on feedback.                                     |
+| Data Cleaning & Preparation       | Completed   | Sahana, Sindhu  | Week 3 | Moderate  | Clean dataset, handle missing values, merge population data.           |
+| Data Analysis for Question 1      | Started     | Sahana          | Week 4 | High      | Perform analysis and visualizations for Question 1 (Geographical).     |
+| Data Analysis for Question 2      | Started     | Sindhu          | Week 4 | High      | Perform analysis and text mining for Question 2 (Historical).          |
+| Draft Report                      | Not Started | Team            | Week 5 | Moderate  | Draft the final report based on findings.                              |
+| Presentation Preparation          | Not Started | Team            | Week 6 | High      | Finalize report, prepare slides, and present findings.                 |
+
+
